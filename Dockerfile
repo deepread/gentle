@@ -8,16 +8,22 @@ RUN DEBIAN_FRONTEND=noninteractive && \
 	apt-get clean
 
 ADD ext /gentle/ext
+
+
 RUN MAKEFLAGS=' -j8' cd /gentle/ext && \
 	./install_kaldi.sh && \
-	make && rm -rf kaldi *.o
+	make #  && rm -rf kaldi *.o
+
+ADD exp /gentle/exp
 
 ADD . /gentle
+RUN cd /gentle && ./install_deps.sh
 RUN cd /gentle && pip install .
-RUN cd /gentle && ./install_models.sh
+
+RUN cd /gentle/ext && make depend && make
 
 EXPOSE 8765
 
 VOLUME /gentle/webdata
 
-CMD cd /gentle && python serve.py
+# CMD cd /gentle && python serve.py
