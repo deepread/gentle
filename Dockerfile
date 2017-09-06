@@ -7,20 +7,20 @@ RUN DEBIAN_FRONTEND=noninteractive && \
 		python-dev wget unzip && \
 	apt-get clean
 
-ADD ext /gentle/ext
+RUN git clone -b deepread https://github.com/deepread/gentle.git && \
+	cd gentle && \
+	git submodule init && \
+	git submodule update
 
-
-RUN MAKEFLAGS=' -j8' cd /gentle/ext && \
+RUN MAKEFLAGS=' -j4' cd /gentle/ext && \
 	./install_kaldi.sh && \
 	make #  && rm -rf kaldi *.o
 
-ADD exp /gentle/exp
-
-ADD . /gentle
-RUN cd /gentle && ./install_deps.sh
 RUN cd /gentle && pip install .
 
 RUN cd /gentle/ext && make depend && make
+
+RUN cd /gentle && ./install_models.sh
 
 EXPOSE 8765
 
